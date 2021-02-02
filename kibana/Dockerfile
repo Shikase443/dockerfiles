@@ -13,13 +13,13 @@ FROM centos:8 AS builder
 
 
 RUN cd /opt && \
-  curl --retry 8 -s -L -O https://artifacts.elastic.co/downloads/kibana/kibana-7.10.2-linux-x86_64.tar.gz && \
+  curl --retry 8 -s -L -O https://artifacts.elastic.co/downloads/kibana/kibana-7.10.2-linux-aarch64.tar.gz && \
   cd -
 
 
 RUN mkdir /usr/share/kibana
 WORKDIR /usr/share/kibana
-RUN tar --strip-components=1 -zxf /opt/kibana-7.10.2-linux-x86_64.tar.gz
+RUN tar --strip-components=1 -zxf /opt/kibana-7.10.2-linux-aarch64.tar.gz
 # Ensure that group permissions are the same as user permissions.
 # This will help when relying on GID-0 to run Kibana, rather than UID-1000.
 # OpenShift does this, for example.
@@ -40,15 +40,15 @@ EXPOSE 5601
 RUN for iter in {1..10}; do \
       yum update --setopt=tsflags=nodocs -y && \
       yum install --setopt=tsflags=nodocs -y \
-        fontconfig freetype shadow-utils libnss3.so  && \
+        fontconfig freetype shadow-utils nss  && \
       yum clean all && exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && \
       sleep 10; \
     done; \
     (exit $exit_code)
 
 # Add an init process, check the checksum to make sure it's a match
-RUN curl -L -o /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64
-RUN echo "37f2c1f0372a45554f1b89924fbb134fc24c3756efaedf11e07f599494e0eff9  /usr/local/bin/dumb-init" | sha256sum -c -
+RUN curl -L -o /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_aarch64
+RUN echo "45b1bbf56cc03edda81e4220535a025bfe3ed6e93562222b9be4471005b3eeb3  /usr/local/bin/dumb-init" | sha256sum -c -
 RUN chmod +x /usr/local/bin/dumb-init
 
 RUN mkdir /usr/share/fonts/local

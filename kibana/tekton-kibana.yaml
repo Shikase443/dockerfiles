@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: elastic
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+        - name: kibana
+          image: __IMAGE__
+          resources:
+            requests:
+              cpu: 1
+              memory: 1Gi
+            limits:
+              cpu: 1
+              memory: 1.5Gi
+          env:
+          - name: SERVER_HOST
+            value: "0.0.0.0"
+          - name: I18N_LOCALE
+            value: "ja-JP"
+          - name: ELASTICSEARCH_URL
+            value: "http://10.0.0.1:30920"
+          - name: ELASTICSEARCH_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: kibana-secret
+                key: es_user
+          - name: ELASTICSEARCH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: kibana-secret
+                key: es_pass
+          - name: NODE_OPTIONS
+            value: "--max-old-space-size=1024"
+          ports:
+            - name: kibana
+              containerPort: 5601

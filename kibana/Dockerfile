@@ -11,11 +11,9 @@
 ################################################################################
 FROM centos:8 AS builder
 
-
 RUN cd /opt && \
   curl --retry 8 -s -L -O https://artifacts.elastic.co/downloads/kibana/kibana-7.11.0-linux-$(arch).tar.gz && \
   cd -
-
 
 RUN mkdir /usr/share/kibana
 WORKDIR /usr/share/kibana
@@ -34,7 +32,6 @@ RUN chmod -R g=u /usr/share/kibana
 ################################################################################
 FROM centos:8
 EXPOSE 5601
-
 
 RUN for iter in {1..10}; do \
       yum update --setopt=tsflags=nodocs -y && \
@@ -112,7 +109,6 @@ LABEL org.label-schema.build-date="2021-02-08T22:42:18.324Z" \
   org.opencontainers.image.url="https://www.elastic.co/products/kibana" \
   org.opencontainers.image.vendor="Elastic" \
   org.opencontainers.image.version="7.11.0"
-
 
 USER kibana
 
